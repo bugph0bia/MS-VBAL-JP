@@ -2,7 +2,8 @@
 VBA Language Specification 日本語訳
 
 ## このドキュメントについて
-VBA の言語仕様ドキュメントを探していたところ Microsoft 公式のドキュメントを見つけましたので、少しずつ読み進めていくとともに、せっかくなので日本語版を用意してみようと思います。  
+VBA の言語仕様ドキュメントを探していたところ Microsoft 公式のドキュメントを見つけましたので、少しずつ日本語訳して読み進めていきます。   
+私の英語能力は拙いので、基本的には各種翻訳サービスを利用させてもらうつもりです。  
 
 ## 原文
 - Web ページ : [[MS-VBAL]: VBA Language Specification](https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/d5418146-0bd2-45eb-9c7a-fd9502722c74?redirectedfrom=MSDN)
