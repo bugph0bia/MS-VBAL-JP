@@ -231,11 +231,21 @@ ampm = *WSC ("am" / "pm" / "a" / "p")
 - `<date-or-time>` に `<date-value>` が含まれない場合、"1899/12/30"という文字からなる `<date-value>` が存在するものとして日付が決定される。
 - `<left-date-value>`, `<middle-date-value>`,  `<right-date-value>` のうち 1 つは `<month-name>` となり得る。
 - $L$ が `<left-date-value>`、 $M$ が `<middle-date-value>`、 $R$ が `<right-date-value>` のデータ値として与えられているとすると、 $L, M, R$ は次のようにカレンダーの日付として解釈される。
-    - 次の通りとする。
-        - $LegalMonth(x) = \begin{cases} true & 0 \le x \le 12 \\ false & otherwise \end{cases}$
-        - $LegalDay(month, day, year) = \begin{cases} false & \begin{cases} \textrm{year < 0 or year > 32767, or} \\ \textrm{LegalMonth(month) is false, or} \\ \textrm{day is not a valid day for the specified month and year} \end{cases} \\ true & otherwise \end{cases}$
-        - $CY$ を実装定義のデフォルトの年とする。
-        - $Year(x) = \begin{cases} x + 2000 & 0 \le x \le 29 \\ x + 1900 & 30 \le x \le 99 \\ x & otherwise \end{cases}$
+
+```math
+LegalMonth(x) = \begin{cases} true & 0 \le x \le 12 \\ false & otherwise \end{cases}
+```
+
+```math
+LegalDay(month, day, year) = \begin{cases} false & \begin{cases} \textrm{year < 0 or year > 32767, or} \\ \textrm{LegalMonth(month) is false, or} \\ \textrm{day is not a valid day for the specified month and year} \end{cases} \\ true & otherwise \end{cases}
+```
+
+- $CY$ を実装定義のデフォルトの年とする。
+
+```math
+Year(x) = \begin{cases} x + 2000 & 0 \le x \le 29 \\ x + 1900 & 30 \le x \le 99 \\ x & otherwise \end{cases}
+```
+
     - $L$ と $M$ が数値で $R$ が存在しない場合、
         - もし $LegalMonth(L)$ および $LegalDay(L, M, CY)$ の場合、月は $L$ 、日は $M$ 、年は $CY$ である。
         - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, CY)$ の場合、月は$M$ 、日は $L$ 、年は $CY$ である。
