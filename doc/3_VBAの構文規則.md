@@ -110,6 +110,7 @@ hex-digit = decimal-digit / %x0041-0046 / %x0061-0066 ;A-F / a-f
 
 - `<decimal-digit>`, `<octal-digit>`, `<hex-digit>` シーケンスは、それぞれ 10 進数、8 進数、16 進数で表される符号なし整数値として解釈される。
 - 各 `<INTEGER>` には定数データ値（セクション 2.1）が関連している。定数のデータ値、データ型（セクション 2.1）、宣言型（セクション 2.2）は次の表で定義される（「有効性」欄が No の場合、 `<INTEGER>` は無効）。
+
 | 基数 | 範囲内の正の `<INTEGER>` | 型サフィックス | `<INTEGER>` の有効性 | 宣言型 | データ型 | 符号付きデータ値 |
 | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
 | 10進数 | 0 ≤ n ≤ 32767 | なし | Yes | `Integer` | `Integer` | n |
@@ -166,6 +167,7 @@ hex-digit = decimal-digit / %x0041-0046 / %x0061-0066 ;A-F / a-f
 | 8進数 | n ≥ &o2000000000000000000000 | 任意 | No |  |  |  |
 | 16進数 | &H100000000 ≤ n ≤ &HFFFFFFFFFFFFFFFF | "^" | Yes | `LongLong` | `LongLong` | n - 232 |
 | 16進数 | n ≥ &H10000000000000000 | 任意 | No |  |  |  |
+
 - 64 ビット演算をサポートしない実装において `LongLong` 型に宣言されたリテラルは、静的に無効である。
 
 ```
@@ -182,16 +184,20 @@ floating-point-type-suffix = "!" / "#" / "@"
 
 静的セマンティクス
 
-- `<FLOAT>` トークンは、バイナリ浮動小数点または通貨データ値を表す。 `<floatingpoint-type-suffix>` は、次の表に従ってトークンに関連付けられたデータ値の宣言型とデータ型を指定する。
+- `<FLOAT>` トークンは、バイナリ浮動小数点または通貨データ値を表す。 `<floatingpoint-type-suffix>` は、下の表に従ってトークンに関連付けられたデータ値の宣言型とデータ型を指定する。
+    - iを `<integer-digits>` の整数値、f を `<fractional-digits>` の整数値、d を `<fractional-digits>` の桁数、x を `<exponent>` の符号付き整数値とする。そして、`<floating-point-literal>` は次の式従って数学的実数である r を表す。
+        - $r = (i + f 10^-d) 10^x$
+    - `<floating-point-literal>` は、その数学的な値が宣言型を使って表現できる最大値より大きい場合は無効となる。
+
 | `<floating-point-type-suffix>` | 宣言型とデータ型 |
 | ---- | ---- |
 | なし | `Double` |
 | ! | `Single` |
 | # | `Double` |
 | @ | `Currency` |
-    - iを `<integer-digits>` の整数値、f を `<fractional-digits>` の整数値、d を `<fractional-digits>` の桁数、x を `<exponent>` の符号付き整数値とする。そして、`<floating-point-literal>` は次の式従って数学的実数である r を表す。
-        - $$ r = (i + f 10^-d) 10^x $$
-    - `<floating-point-literal>` は、その数学的な値が宣言型を使って表現できる最大値より大きい場合は無効となる。
+
+（訳注：Markdown都合で表の位置を移動した）
+
 - `<floating-point-literal>` の宣言型が `Currency` の場合、r の小数部は偶数丸め（セクション 5.5.1.2.1.1）により有効数字 4 桁で丸められる。
 
 ### 3.3.3 日付トークン
@@ -224,33 +230,33 @@ ampm = *WSC ("am" / "pm" / "a" / "p")
 - `<date-or-time>` が `<time-value>` を含まない場合、その指定時刻は "00:00:00" からなる `<time-value>` が存在するものとして決定される。
 - `<date-or-time>` に `<date-value>` が含まれない場合、"1899/12/30"という文字からなる `<date-value>` が存在するものとして日付が決定される。
 - `<left-date-value>`, `<middle-date-value>`,  `<right-date-value>` のうち 1 つは `<month-name>` となり得る。
-- $L$ が `<left-date-value>`、$M$ が `<middle-date-value>`、$R$ が `<right-date-value>` のデータ値として与えられているとすると、$L, M, R$ は次のようにカレンダーの日付として解釈される。
+- $L$ が `<left-date-value>`、 $M$ が `<middle-date-value>`、 $R$ が `<right-date-value>` のデータ値として与えられているとすると、 $L, M, R$ は次のようにカレンダーの日付として解釈される。
     - 次の通りとする。
-        -  $LegalMonth(x) = \begin{cases} true & 0 \le x \le 12 \\ false & otherwise \end{cases}$
+        - $LegalMonth(x) = \begin{cases} true & 0 \le x \le 12 \\ false & otherwise \end{cases}$
         - $LegalDay(month, day, year) = \begin{cases} false & \begin{cases} \textrm{year < 0 or year > 32767, or} \\ \textrm{LegalMonth(month) is false, or} \\ \textrm{day is not a valid day for the specified month and year} \end{cases} \\ true & otherwise \end{cases}$
         - $CY$ を実装定義のデフォルトの年とする。
         - $Year(x) = \begin{cases} x + 2000 & 0 \le x \le 29 \\ x + 1900 & 30 \le x \le 99 \\ x & otherwise \end{cases}$
     - $L$ と $M$ が数値で $R$ が存在しない場合、
-        - もし $LegalMonth(L)$ および $LegalDay(L, M, CY)$ の場合、月は $L$、日は $M$、年は $CY$ である。
-        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, CY)$ の場合、月は$M$、日は $L$、年は $CY$ である。
-        - それ以外で、もし $LegalMonth(L)$ の場合、月は $L$、日は $1$、年は $M$ である。
-        - それ以外で、もし $LegalMonth(M)$ の場合、月は $M$、日は $1$、年は $L$ である。
+        - もし $LegalMonth(L)$ および $LegalDay(L, M, CY)$ の場合、月は $L$ 、日は $M$ 、年は $CY$ である。
+        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, CY)$ の場合、月は$M$ 、日は $L$ 、年は $CY$ である。
+        - それ以外で、もし $LegalMonth(L)$ の場合、月は $L$ 、日は $1$ 、年は $M$ である。
+        - それ以外で、もし $LegalMonth(M)$ の場合、月は $M$ 、日は $1$ 、年は $L$ である。
         - それ以外の場合、`<date-value>` は有効ではない。
     - $L, M, R$ が数値の場合、
-        - $LegalMonth(L)$ および $LegalDay(L, M, Year(R))$ の場合、月は $L$、日は $M$、年は $Year(R)$ である。
-        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, R, Year(L))$ の場合、月は $M$、日は $R$、年は $Year(L)$ である。
-        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, Year(R))$ の場合、月は $M$、日は $L$、年は $Year(R)$ である。
+        - $LegalMonth(L)$ および $LegalDay(L, M, Year(R))$ の場合、月は $L$ 、日は $M$ 、年は $Year(R)$ である。
+        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, R, Year(L))$ の場合、月は $M$ 、日は $R$ 、年は $Year(L)$ である。
+        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, Year(R))$ の場合、月は $M$ 、日は $L$ 、年は $Year(R)$ である。
         - それ以外の場合、`<date-value>` は有効ではない。
     - $L, M$ のいずれかが数値ではなく、かつ $R$ が存在しない場合、
         - 次の通りとする。
             - $N$ を $L$ と $M$ いずれかの数値の方とする。
             - $L$ と $M$ のうち数値ではない値の月名または略号に対応する 1～12 の範囲の値を $M$ とする。
-        - $LegalDay(M, N, CY)$ ならば、月は $M$、日は $N$、年は $CY$ である。
-        - それ以外の場合、月は $M$、日は $1$、年は $Year(N)$ である。
+        - $LegalDay(M, N, CY)$ ならば、月は $M$ 、日は $N$ 、年は $CY$ である。
+        - それ以外の場合、月は $M$ 、日は $1$ 、年は $Year(N)$ である。
     - それ以外の（$R$ が存在し、$L, M, R$ のいずれかが数値ではない）場合、
         - 次の通りとする。
             - $L, M, R$ のうち数値でない値の月名または略号に対応する 1～12 の範囲の値を$M$ とする。
             - $L, M, R$ のうち数値である値を $N1, N2$ とする。（訳注：原文では両方 N1 とされており誤記と思われるので修正した）
-        - もし $LegalDay(M, N1, Year(N2))$ の場合、月は $M$、日は $N1$、年は $Year(N2)$ である。
-        - もし $LegalDay(M, N2, Year(N1))$ の場合、月は $M$、日は $N2$、年は $Year(N1)$ である。
+        - もし $LegalDay(M, N1, Year(N2))$ の場合、月は $M$ 、日は $N1$ 、年は $Year(N2)$ である。
+        - それ以外で、もし $LegalDay(M, N2, Year(N1))$ の場合、月は $M$ 、日は $N2$ 、年は $Year(N1)$ である。
         - それ以外の場合、`<date-value>` は有効ではない。
