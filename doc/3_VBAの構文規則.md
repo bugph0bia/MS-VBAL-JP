@@ -261,7 +261,8 @@ $$
 
 $$
 Year(x) = \begin{cases}
-  x + 2000 & 0 \le x \le 29 \\ x + 1900 & 30 \le x \le 99 \\
+  x + 2000 & 0 \le x \le 29 \\
+  x + 1900 & 30 \le x \le 99 \\
   x & otherwise
 \end{cases}
 $$
