@@ -324,3 +324,61 @@ string-character = NO-LINE-CONTINUATION ((double-quote double-quote)  /  non-lin
 - `<STRING>` が `<line-continuation>` 要素で終わっている場合、データ値の最終文字は `<line-continuation>` の前の `<WSC>` でない右端の文字となる。
 - `<STRING>` が `<LINE-END>` 要素で終わる場合、関連するデータ値の最終文字は `<LINE-END>` の前の `<line-terminator>` でない右端の文字となる。
 
+### 3.3.5 識別子トークン
+
+```
+lex-identifier = Latin-identifier / codepage-identifier / Japanese-identifier / Korean-identifier / simplified-Chinese-identifier / traditional-Chinese-identifier
+
+Latin-identifier = first-Latin-identifier-character *subsequent-Latin-identifier-character
+first-Latin-identifier-character = (%x0041-005A / %x0061-007A) ; A-Z / a-z
+subsequent-Latin-identifier-character = first-Latin-identifier-character / decimal-digit / %x5F    ; underscore
+```
+
+静的セマンティクス
+
+- アルファベットの大文字と小文字は、VBA の識別子では同等とみなされる。対応する `<first-Latin-identifier-character>` 文字の大文字/小文字のみが異なる二つの識別子は、同一であるとみなされる。
+- 実装は、`<Latin-identifier>` をサポート<ins>しなければならない</ins>。実装は他の識別子形式を 1 つ以上サポートする場合があり、その場合は識別子形式の併用を<ins>制限してもよい</ins>。
+
+#### 3.3.5.1 非アルファベット識別子
+
+```
+Japanese-identifier = first-Japanese-identifier-character *subsequent-Japanese-identifier-character
+first-Japanese-identifier-character = (first-Latin-identifier-character / CP932-initial-character)
+subsequent-Japanese-identifier-character = (subsequent-Latin-identifier-character / CP932-subsequent-character)
+CP932-initial-character = < character ranges specified in section 3.3.5.1.1>
+CP932-subsequent-character = < character ranges specified in section 3.3.5.1.1>
+
+Korean-identifier = first-Korean-identifier-character *subsequent Korean-identifier-character
+first-Korean-identifier-character = (first-Latin-identifier-character / CP949-initial-character)
+subsequent-Korean-identifier-character = (subsequent-Latin-identifier-character / CP949-subsequent-character)
+CP949-initial-character = < character ranges specified in section 3.3.5.1.2>
+CP949-subsequent-character = < character ranges specified in section 3.3.5.1.2>
+
+simplified-Chinese-identifier = first-sChinese-identifier-character *subsequent-sChinese-identifier-character 
+first-sChinese-identifier-character = (first-Latin-identifier-character / CP936-initial-character)
+subsequent-sChinese-identifier-character = (subsequent-Latin-identifier-character / CP936-subsequent-character)
+CP936-initial-character = < character ranges specified in section 3.3.5.1.3>
+CP936-subsequent-character = < character ranges specified in section 3.3.5.1.3>
+
+traditional-Chinese-identifier = first-tChinese-identifier-character *subsequent-tChinese-identifier-character
+first-tChinese-identifier-character = (first-Latin-identifier-character / CP950-initial-character)
+subsequent-tChinese-identifier-character = (subsequent-Latin-identifier-character / CP950-subsequent-character)
+CP950-initial-character = < character ranges specified in section 3.3.5.1.4>
+CP950-subsequent-character = < character ranges specified in section 3.3.5.1.4>
+
+codepage-identifier = (first-Latin-identifier-character / CP2-character) *(subsequent-Latin-identifier-character / CP2-character)
+
+CP2-character = <any Unicode character that has a mapping to the character range %x80-FF in a Microsoft Windows supported code page>
+```
+
+アルファベット以外の表意文字を含む識別子に対する VBA のサポートは [Unicode](https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/213ca0c8-6b82-4899-80a3-3c76eb534829#gt_c305d0ab-8b94-461a-bd76-13b40cb8c4d8) が作成されるより前の文字コード標準に基づいて設計されたため、非アルファベット識別子は類似の Unicode 文字クラスを直接使用するのではなく、これらのレガシー標準のコードポイントに対応する Unicode 文字から指定されています。
+
+Microsoft Windows コードページ内の文字に対応する Unicode 文字で、1 バイトのコードポイントが %x80-FF のものはすべて有効な `<CP2-characters>` となる。このような文字を定義しているコードページは、Windows コードページ 874, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258 である。これらのコードページの定義と、個々のコードページ固有のコードポイントの Unicode コードポイントへのマッピングは、[[UNICODE-BESTFIT]](https://go.microsoft.com/fwlink/?LinkId=95708) でホストされているファイルによって指定され、[[UNICODE-README]](https://go.microsoft.com/fwlink/?LinkId=95709) によって説明されている。[[CODEPG]](https://go.microsoft.com/fwlink/?LinkId=89840) は、コードページのコードポイントとその対応する Unicode 文字へのマッピング情報なを提供する。
+
+##### 3.3.5.1.1 日本語識別子
+
+日本語を含む識別子の VBA サポートは、Windows コードページ 932 [[UNICODE-BESTFIT]](https://go.microsoft.com/fwlink/?LinkId=95708) に基づいている。日本語文字は、8 ビットのシングルバイト文字と 16 ビットのダブルバイト文字としてエンコードされ、コードポイントは %x80 から始まる。Windows コードページ 932 のコードポイントに相当する Unicode は [UNICODE-BESTFIT] で提供されているファイル bestfit932.txt で指定されている。%x80-FF の範囲内の文字の多くは、コードポイントの 16 ビットエンコーディングの先頭バイトとして機能する。しかし、この範囲内にも有効な文字は存在する。
+
+`<CP932-initial-character>` は、定義済みのコードページ 932 文字に対応する任意の Unicode 文字にすることができる。この文字の Windows コードページ 932 のコード ポイントは %x7F よりも大きくなる。ただし、先頭バイトが %x80-FF の範囲のコードポイントと、明示的に除外されているコードポイント %x8140, %x8143-8151, %x815E-8197, %x824f-8258 は除く。
+
+`<CP932-subsequent-character>` は %x824f-8258 を除いて `<CP932-initial-character>` と同様に定義される。
