@@ -242,18 +242,18 @@ $L$ が `<left-date-value>`、 $M$ が `<middle-date-value>`、 $R$ が `<right-
 $$
 LegalMonth(x) = \begin{cases}
   true & 0 \le x \le 12 \\
-  false & otherwise
+  false & \text{上記以外}
 \end{cases}
 $$
 
 $$
 LegalDay(month, day, year) = \begin{cases}
   false & \begin{cases}
-    \textrm{year < 0 or year > 32767, or} \\
-    \textrm{LegalMonth(month) is false, or} \\
-    \textrm{day is not a valid day for the specified month and year}
+    \textrm{year < 0 または year > 32767 または} \\
+    \textrm{LegalMonth(month) が false または} \\
+    \textrm{day が指定された年月において有効ではない}
   \end{cases} \\
-  true & otherwise
+  true & \text{上記以外}
 \end{cases}
 $$
 
@@ -263,7 +263,7 @@ $$
 Year(x) = \begin{cases}
   x + 2000 & 0 \le x \le 29 \\
   x + 1900 & 30 \le x \le 99 \\
-  x & otherwise
+  x & \text{上記以外}
 \end{cases}
 $$
 
