@@ -168,6 +168,8 @@ hex-digit = decimal-digit / %x0041-0046 / %x0061-0066 ;A-F / a-f
 | 16進数 | &H100000000 ≤ n ≤ &HFFFFFFFFFFFFFFFF | "^" | Yes | `LongLong` | `LongLong` | n - 232 |
 | 16進数 | n ≥ &H10000000000000000 | 任意 | No |  |  |  |
 
+（訳注："注1" とあるが参照先が見つかっていない）
+
 - 64 ビット演算をサポートしない実装において `LongLong` 型に宣言されたリテラルは、静的に無効である。
 
 ```
@@ -230,43 +232,63 @@ ampm = *WSC ("am" / "pm" / "a" / "p")
 - `<date-or-time>` が `<time-value>` を含まない場合、その指定時刻は "00:00:00" からなる `<time-value>` が存在するものとして決定される。
 - `<date-or-time>` に `<date-value>` が含まれない場合、"1899/12/30"という文字からなる `<date-value>` が存在するものとして日付が決定される。
 - `<left-date-value>`, `<middle-date-value>`,  `<right-date-value>` のうち 1 つは `<month-name>` となり得る。
-- $L$ が `<left-date-value>`、 $M$ が `<middle-date-value>`、 $R$ が `<right-date-value>` のデータ値として与えられているとすると、 $L, M, R$ は次のようにカレンダーの日付として解釈される。
+- 「3.3.3.1 日付トークンの解釈方法」に示す内容で値を決定する。（訳注：数式等が混在する関係上、記載内容を別の章に移した）
 
-```math
-LegalMonth(x) = \begin{cases} true & 0 \le x \le 12 \\ false & otherwise \end{cases}
-```
+### 3.3.3.1 日付トークンの解釈方法
+$L$ が `<left-date-value>`、 $M$ が `<middle-date-value>`、 $R$ が `<right-date-value>` のデータ値として与えられているとすると、 $L, M, R$ は次のようにカレンダーの日付として解釈される。
 
-```math
-LegalDay(month, day, year) = \begin{cases} false & \begin{cases} \textrm{year < 0 or year > 32767, or} \\ \textrm{LegalMonth(month) is false, or} \\ \textrm{day is not a valid day for the specified month and year} \end{cases} \\ true & otherwise \end{cases}
-```
+まず、下記の通り式と定数を定義する。
+
+$$
+LegalMonth(x) = \begin{cases}
+  true & 0 \le x \le 12 \\
+  false & otherwise
+\end{cases}
+$$
+
+$$
+LegalDay(month, day, year) = \begin{cases}
+  false & \begin{cases}
+    \textrm{year < 0 or year > 32767, or} \\
+    \textrm{LegalMonth(month) is false, or} \\
+    \textrm{day is not a valid day for the specified month and year}
+  \end{cases} \\
+  true & otherwise
+\end{cases}
+$$
 
 - $CY$ を実装定義のデフォルトの年とする。
 
-```math
-Year(x) = \begin{cases} x + 2000 & 0 \le x \le 29 \\ x + 1900 & 30 \le x \le 99 \\ x & otherwise \end{cases}
-```
+$$
+Year(x) = \begin{cases}
+  x + 2000 & 0 \le x \le 29 \\ x + 1900 & 30 \le x \le 99 \\
+  x & otherwise
+\end{cases}
+$$
 
-    - $L$ と $M$ が数値で $R$ が存在しない場合、
-        - もし $LegalMonth(L)$ および $LegalDay(L, M, CY)$ の場合、月は $L$ 、日は $M$ 、年は $CY$ である。
-        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, CY)$ の場合、月は$M$ 、日は $L$ 、年は $CY$ である。
-        - それ以外で、もし $LegalMonth(L)$ の場合、月は $L$ 、日は $1$ 、年は $M$ である。
-        - それ以外で、もし $LegalMonth(M)$ の場合、月は $M$ 、日は $1$ 、年は $L$ である。
-        - それ以外の場合、`<date-value>` は有効ではない。
-    - $L, M, R$ が数値の場合、
-        - $LegalMonth(L)$ および $LegalDay(L, M, Year(R))$ の場合、月は $L$ 、日は $M$ 、年は $Year(R)$ である。
-        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, R, Year(L))$ の場合、月は $M$ 、日は $R$ 、年は $Year(L)$ である。
-        - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, Year(R))$ の場合、月は $M$ 、日は $L$ 、年は $Year(R)$ である。
-        - それ以外の場合、`<date-value>` は有効ではない。
-    - $L, M$ のいずれかが数値ではなく、かつ $R$ が存在しない場合、
-        - 次の通りとする。
-            - $N$ を $L$ と $M$ いずれかの数値の方とする。
-            - $L$ と $M$ のうち数値ではない値の月名または略号に対応する 1～12 の範囲の値を $M$ とする。
-        - $LegalDay(M, N, CY)$ ならば、月は $M$ 、日は $N$ 、年は $CY$ である。
-        - それ以外の場合、月は $M$ 、日は $1$ 、年は $Year(N)$ である。
-    - それ以外の（$R$ が存在し、$L, M, R$ のいずれかが数値ではない）場合、
-        - 次の通りとする。
-            - $L, M, R$ のうち数値でない値の月名または略号に対応する 1～12 の範囲の値を$M$ とする。
-            - $L, M, R$ のうち数値である値を $N1, N2$ とする。（訳注：原文では両方 N1 とされており誤記と思われるので修正した）
-        - もし $LegalDay(M, N1, Year(N2))$ の場合、月は $M$ 、日は $N1$ 、年は $Year(N2)$ である。
-        - それ以外で、もし $LegalDay(M, N2, Year(N1))$ の場合、月は $M$ 、日は $N2$ 、年は $Year(N1)$ である。
-        - それ以外の場合、`<date-value>` は有効ではない。
+次に、以下の通り解釈する。
+
+- $L$ と $M$ が数値で $R$ が存在しない場合、
+    - もし $LegalMonth(L)$ および $LegalDay(L, M, CY)$ の場合、月は $L$ 、日は $M$ 、年は $CY$ である。
+    - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, CY)$ の場合、月は$M$ 、日は $L$ 、年は $CY$ である。
+    - それ以外で、もし $LegalMonth(L)$ の場合、月は $L$ 、日は $1$ 、年は $M$ である。
+    - それ以外で、もし $LegalMonth(M)$ の場合、月は $M$ 、日は $1$ 、年は $L$ である。
+    - それ以外の場合、`<date-value>` は有効ではない。
+- $L, M, R$ が数値の場合、
+    - $LegalMonth(L)$ および $LegalDay(L, M, Year(R))$ の場合、月は $L$ 、日は $M$ 、年は $Year(R)$ である。
+    - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, R, Year(L))$ の場合、月は $M$ 、日は $R$ 、年は $Year(L)$ である。
+    - それ以外で、もし $LegalMonth(M)$ および $LegalDay(M, L, Year(R))$ の場合、月は $M$ 、日は $L$ 、年は $Year(R)$ である。
+    - それ以外の場合、`<date-value>` は有効ではない。
+- $L, M$ のいずれかが数値ではなく、かつ $R$ が存在しない場合、
+    - 次の通りとする。
+        - $N$ を $L$ と $M$ いずれかの数値の方とする。
+        - $L$ と $M$ のうち数値ではない値の月名または略号に対応する 1～12 の範囲の値を $M$ とする。
+    - $LegalDay(M, N, CY)$ ならば、月は $M$ 、日は $N$ 、年は $CY$ である。
+    - それ以外の場合、月は $M$ 、日は $1$ 、年は $Year(N)$ である。
+- それ以外の（$R$ が存在し、$L, M, R$ のいずれかが数値ではない）場合、
+    - 次の通りとする。
+        - $L, M, R$ のうち数値でない値の月名または略号に対応する 1～12 の範囲の値を$M$ とする。
+        - $L, M, R$ のうち数値である値を $N1, N2$ とする。（訳注：原文では両方 N1 とされており誤記と思われるので修正した）
+    - もし $LegalDay(M, N1, Year(N2))$ の場合、月は $M$ 、日は $N1$ 、年は $Year(N2)$ である。
+    - それ以外で、もし $LegalDay(M, N2, Year(N1))$ の場合、月は $M$ 、日は $N2$ 、年は $Year(N1)$ である。
+    - それ以外の場合、`<date-value>` は有効ではない。
