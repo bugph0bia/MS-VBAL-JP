@@ -293,3 +293,34 @@ $$
     - もし $LegalDay(M, N1, Year(N2))$ の場合、月は $M$ 、日は $N1$ 、年は $Year(N2)$ である。
     - それ以外で、もし $LegalDay(M, N2, Year(N1))$ の場合、月は $M$ 、日は $N2$ 、年は $Year(N1)$ である。
     - それ以外の場合、`<date-value>` は有効ではない。
+
+- `<hour-value>` の要素である `<decimal-literal>` は 0 から 23 の範囲の整数で<ins>なければならない</ins>。
+- `<minute-value>` の要素である `<decimal-literal>` は  0 から 59 の範囲の整数で<ins>なければならない</ins>。
+- `<second-value>` の要素である `<decimal-literal>` は 0 から 59 の範囲の整数で<ins>なければならない</ins>。
+
+- `<time-value>` が "pm" または "p" からなる `<ampm>` 要素を含み、`<hour-value>` が 0 から 11 の範囲の整数値を持つ場合、`<hour-value>` は実際の値より 12 大きい整数値として使用される。
+- `<hour-value>` が 12 より大きい場合、`<ampm>` 要素は無視される。
+- `<time-value>` が "am" または "a" からなる `<ampm>` 要素を含み、`<hour-value>` が整数値 12 の場合、`<hour-value>` は 0 として使用される。
+- `<time-value>` に `<minute-value>` が含まれていない場合、整数値 0 の `<minute-value>` が存在するものとして扱われる。
+- `<time-value>` に `<second-value>` が含まれていない場合、整数値 0 の `<second-value>` が存在するものとして扱われる。
+- `<time-value>` の `<hour-value> `要素の整数値を $h$ 、<time-value> の `<minute-value>` 要素の整数値を $m$ 、`<time-value>` の `<second-value>` の整数値を $s$ とすると、`<time-value>` の指定時刻は、 $(3600h+60m+s)/86400$ の式で定義される。
+
+### 3.3.4 文字列トークン
+
+```
+STRING = double-quote *string-character (double-quote /  line-continuation / LINE-END)
+double-quote = %x0022  ; "
+string-character = NO-LINE-CONTINUATION ((double-quote double-quote)  /  non-line-termination-character)
+```
+
+静的セマンティクス
+
+- `<STRING>` トークン（セクション 3.3）は、データ型（セクション 2.1）と宣言型（セクション 2.2）が `String` のデータ値（セクション 2.1）を関連付ける。
+- 関連付けられた文字列データ値の長さは、`<STRING>` トークンを構成する `<string-character>` 要素の数であり `<STRING>` トークンの長さではない。
+- データ値は、`<string-character>` 要素に対応する実装定義の符号化文字列からなり、左から右の順に、最も左の `<string-character>` 要素がその先頭要素を、最も右の `<string-character>` 要素がその最終文字を規定する。
+- `<string-character>` 要素のいずれかが実装定義の文字セットでエンコードされていない場合、`<STRING>` トークンは無効である。
+- 2 つの `<double-quote>` 文字のシーケンスはデータ値内で文字 U+0022 が 1 つだけ出現することを表す。
+- `<string-character>` 要素が存在しない場合、データ値は長さ 0 の空文字列となる。
+- `<STRING>` が `<line-continuation>` 要素で終わっている場合、データ値の最終文字は `<line-continuation>` の前の `<WSC>` でない右端の文字となる。
+- `<STRING>` が `<LINE-END>` 要素で終わる場合、関連するデータ値の最終文字は `<LINE-END>` の前の `<line-terminator>` でない右端の文字となる。
+
