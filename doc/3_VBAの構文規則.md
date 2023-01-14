@@ -405,3 +405,97 @@ Microsoft Windows コードページ内の文字に対応する Unicode 文字�
 `<CP950-initial-character>` は、Windows コードページ 950 のコードポイントのうち、%xA2CF-A2FE, %xA340-F9DD に対応する任意の Unicode 文字で<ins>あってもよい</ins>。
 
 `<CP950-subsequent-character>` は、コードポイント %xA1C5 と %xA2AF-A2B8 を加えて `<CP950-initial-character>` と同様に定義される。
+
+#### 3.3.5.2 予約済み識別子とそれ以外の識別子
+
+`<reserved-identifier>` は `<Latin-identifier>` に準拠し、VBA 言語内で特別な用途のために予約されているすべての文字列を指定する。キーワードは `<reserved-identifier>` を意味する代替用語である。この仕様の散文セクションで特定のキーワードを指定する必要がある場合、キーワードは太字で強調されて書かれている（訳注：太字ではなくコードブロックで表記する）。すべての VBA 識別子と同様に `<reserved-identifier>` は大文字と小文字を区別しない。`<reserved-identifier>` はトークン（セクション 3.３）である。構文文法内の要素として `<reserved-identifier>` 要素の 1 つが引用されて出現すると、対応するトークンへの参照となる。トークン要素 `<IDENTIFIER>` は `<reserved-identifier>` でない識別子を指定するために構文文法内で使用される。
+
+静的セマンティクス
+
+- `<IDENTIFIER>` の名称値は `<lex-identifier>` のテキストである。
+- `<reserved-identifier>` トークンの名称値はその `<Latin-identifier>` のテキストとなる。
+- 大文字小文字を区別しないテキスト比較で同じになのであれば、2 つの名称値は同じものとなる。
+    - `<reserved-identifier>` は、以下のルールで用途別に分類される。中には複数の用途を持ち複数の規則に登場するものもある。
+
+```
+statement-keyword = "Call" / "Case" /"Close" / "Const"/ "Declare" / "DefBool" / "DefByte" / "DefCur" / "DefDate" / "DefDbl" / "DefInt" / "DefLng" / "DefLngLng" / "DefLngPtr" / "DefObj" / "DefSng" / "DefStr" / "DefVar" / "Dim" / "Do" / "Else" / "ElseIf" / "End" / "EndIf" /  "Enum" / "Erase" / "Event" / "Exit" / "For" / "Friend" / "Function" / "Get" / "Global" / "GoSub" / "GoTo" / "If" / "Implements"/ "Input" / "Let" / "Lock" / "Loop" / "LSet" / "Next" / "On" / "Open" / "Option" / "Print" / "Private" / "Public" / "Put" / "RaiseEvent" / "ReDim" / "Resume" / "Return" / "RSet" / "Seek" / "Select" / "Set" / "Static" / "Stop" / "Sub" / "Type" / "Unlock" / "Wend" / "While" / "With" / "Write"
+
+rem-keyword = "Rem"
+marker-keyword = "Any" / "As" / "ByRef" / "ByVal" / "Case" / "Each" / "Else" / "In"/ "New" / "Shared" / "Until" / "WithEvents" / "Write" / "Optional" / "ParamArray" / "Preserve" / "Spc" / "Tab" / "Then" / "To"
+
+operator-identifier = "AddressOf" / "And" / "Eqv" / "Imp" / "Is" / "Like" / "New" / "Mod" / "Not" / "Or" / "TypeOf" / "Xor"
+```
+
+`<statement-keyword>` は、ステートメントや宣言の最初の構文要素である `<reserved-identifier>` である。`<marker-keyword>` は、文の内部の構文構造の一部として使われる `<reserved-identifier> `である。`<operator-identifier>` は `<reserved-identifier> `で式の中で演算子として使われる。
+
+```
+reserved-name = "Abs" / "CBool" / "CByte" / "CCur" / "CDate" / "CDbl" / "CDec" / "CInt" / "CLng" / "CLngLng" / "CLngPtr" / "CSng" / "CStr" / "CVar" / "CVErr" / "Date" / "Debug" / "DoEvents" / "Fix" / "Int" / "Len" / "LenB" / "Me" / "PSet" / "Scale" / "Sgn" / "String"
+
+special-form = "Array" / "Circle" / "Input" / "InputB"  / "LBound" / "Scale" / "UBound"
+```
+
+```
+literal-identifier = boolean-literal-identifier / object-literal-identifier / variant-literal-identifier
+boolean-literal-identifier = "true" / "false"
+object-literal-identifier = "nothing"
+variant-literal-identifier = "empty" / "null"
+```
+
+`<reserved-name>` は `<reserved-identifier>` で、通常のプログラム定義のエンティティ（セクション 2.2）のように式中で使用される。`<special-form>` は `<reserved-identifier> `で、プログラム定義のプロシージャ名のように式中で使われるが、その引数には特別な構文規則がある。`<reserved-type-identifier>` は、宣言内であるエンティティの宣言型（セクション 2.2）を特定するために使用される。
+
+`<literal-identifier>`は、特定の識別されたデータ値（セクション 2.1）を表す `<reserved-identifier>` である。`True` または `False` を指定する `<boolean-literal-identifier>` は `Boolean` の宣言型を持ち、それぞれ `True` または `False` のデータ値を持つ。`<object-literal-identifier>` は、`Object` の宣言型を持ち、`Nothing` のデータ値を持つ。"empty" または "null" を指定する `<variant-literal-identifier>` は `Variant` の宣言型を持ち、それぞれ `Empty` と `Null` のデータ値を持つ。
+
+```
+reserved-for-implementation-use = "Attribute" / "LINEINPUT" / "VB_Base" / "VB_Control" / "VB_Creatable" /  "VB_Customizable" / "VB_Description" / "VB_Exposed" / "VB_Ext_KEY " / "VB_GlobalNameSpace" / "VB_HelpID" / "VB_Invoke_Func" / "VB_Invoke_Property " / "VB_Invoke_PropertyPut" / "VB_Invoke_PropertyPutRefVB_MemberFlags" / "VB_Name" / "VB_PredeclaredId" / "VB_ProcData" / "VB_TemplateDerived" / "VB_UserMemId" / "VB_VarDescription" / "VB_VarHelpID" / "VB_VarMemberFlags" / "VB_VarProcData " / "VB_VarUserMemId"
+
+future-reserved = "CDecl" / "Decimal" / "DefDec"
+```
+
+`<reserved-for-implementation-use>` は `<reserved-identifier>` であり、現在 VBA 言語には定義されていないが、言語実装者が使用するために予約されている。`<future-reserved>` は `<reserved-identifier>` であり、現在は VBA 言語に対して意味を持たず、将来起こりうる言語の拡張のために予約されたものである。
+
+#### 3.3.5.3 特殊な識別子構文
+
+```
+FOREIGN-NAME = "[" foreign-identifier "]"
+foreign-identifier = 1*non-line-termination-character
+```
+
+`<FOREIGN-NAME>` は識別子のように使用されるが、識別子を形成するための VBA 規則に適合しないテキストシーケンスを表すトークン（セクション 3.3）である。通常、`<FOREIGN-NAME>` は VBA 以外のプログラミング言語を使って作成されたエンティティ（セクション 2.2）を参照するために使用される。
+
+静的セマンティクス
+
+- `<FOREIGN-NAME>` の名称値（セクション 3.3.5.1）は、その `<foreign-identifier>` のテキストとなる。
+
+```
+BUILTIN-TYPE = reserved-type-identifier /  ("[" reserved-type-identifier "]") / "object" / "[object]"
+```
+
+- VBA のコンテキストによっては、`<reserved-type-identifier>` と同じ名前の `<FOREIGN-NAME>` はその `<reserved-type-identifier>` と同等に使用することができる。名称値が "object" の識別子は`<reserved-identifier>` ではないが、一般に `<reserved-type-identifier>` であるかのように使われる。
+
+静的セマンティクス
+
+- `<BUILTIN-TYPE>` の名称値は、その `<reserved-type-identifier>` 要素があればそのテキストとなる。そうでなければ "object" である。
+- `<BUILTIN-TYPE>` 要素の宣言型（セクション 2.2）は、`<BUILTIN-TYPE>` の名称値と同じ名前を持つ宣言型とする。
+
+```
+TYPED-NAME = IDENTIFIER  type-suffix
+
+type-suffix = "%" / "&" / "^" / "!" / "#" / "@" / "$"
+```
+
+`<TYPED-NAME>` は、`<IDENTIFIER>` の直後に `<type-suffix>` が空白を挟むことなく続くものである。
+
+静的セマンティクス
+
+- `<TYPED-NAME>` の名称値は、その `<IDENTIFIER>` 要素の名称値である。
+- `<TYPED-NAME>` の宣言型は，次の表で定義される。
+
+| `<type-suffix>` | 宣言型 |
+| ---- | ---- |
+| % | `Integer`|
+| & | `Long` |
+| ^ | `LongLong` |
+| ! | `Single` |
+| # | `Double` |
+| @ | `Currency` |
+| $ | `String` |
