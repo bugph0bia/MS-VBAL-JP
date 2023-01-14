@@ -499,3 +499,61 @@ type-suffix = "%" / "&" / "^" / "!" / "#" / "@" / "$"
 | # | `Double` |
 | @ | `Currency` |
 | $ | `String` |
+
+## 3.4 条件付きコンパイル
+
+モジュール本体には、モジュール（セクション 4.2）で定義された VBA プログラムコードの一部として、条件付きで解釈から除外できる論理行（セクション 3.2 ）を含めることができる。このような行を論理的に除去したモジュール本体（セクション 4.2）を前処理済モジュール本体と呼ぶ。前処理されたモジュール本体は、以下の文法に従ってトークン化された `<module-body-lines>` 内の条件付きコンパイル指示を解釈することによって決定される。
+
+```
+conditional-module-body = cc-block
+cc-block = *(cc-const / cc-if-block / logical-line)
+```
+
+静的セマンティクス
+
+- この文法の規則に従わない `<module-body-logical-structure>` は、有効な VBA モジュールではない。
+- `<conditional-module-body>` を直接構成する `<cc-block>` は包含ブロックである。
+- 包含ブロックの直接の要素である `<logical-line>` 行は、すべて前処理されたモジュール本体に含まれる。
+- 除外ブロック (セクション 3.4.2) の直接の要素である `<logical-line>` 行はすべて前処理されたモジュール本体に含まれない。
+- 前処理されたモジュール本体内の `<logical-line>` 行の相対的な順序は，元のモジュール本体内の相対的な順序と同じである。
+
+### 3.4.1 条件付きコンパイル Const ディレクティブ
+
+```
+cc-const = LINE-START  "#"  "const" cc-var-lhs "=" cc-expression cc-eol
+cc-var-lhs = name
+cc-eol = [single-quote *non-line-termination-character] LINE-END
+```
+
+静的セマンティクス
+
+- すべての `<cc-const>` 行は、前処理されたモジュール本体（セクション 3.4）から除外される。
+- すべての `<cc-const>` 命令は、除外ブロック（セクション 3.4.2）に含まれるものを含めて処理される。
+- `<cc-var-lhs>` が `<type-suffix>` を持つ `<TYPED-NAME>` である場合、`<type-suffix>` は無視される。
+- `<cc-var-lhs>` の `<name>` の名称値（セクション 3.3.5.1）は、`<conditionalmodule-body>` 内のすべての `<cc-var-lhs>` （`<cc-block>` が除外ブロックのものを含む）について異なって<ins>いなければならない</ins>。
+- `<cc-expression>` のデータ値（セクション 2.1）は、`<cc-expression>` の定数値（セクション 5.6.16.2）となる。
+- `<cc-expression>` の定数評価で評価エラーが発生した場合、前処理されたモジュール本体の内容は不定となる。
+- `<cc-const>` は、包含モジュールの `<cc-expression>` 要素にアクセス可能な定数バインディングを定義する。バインドされた名前は `<cc-var-lhs>` の `<name>` の名称値であり、定数バインディングの宣言型は `Variant` であり、定数バインディングのデータ値は `<cc-expression>` のデータ値である。
+- `<cc-var-lhs>` の `<name>` の値は、プロジェクトレベルの条件付きコンパイル定数の束縛名と同じにすることができる。その場合、`<cc-const>` 要素で定義される定数バインディングは、プロジェクトレベルのバインディングを陰で支える。
+
+### 3.4.2 条件付きコンパイル If ディレクティブ
+
+```
+cc-if-block = cc-if
+    cc-block
+    *cc-elseif-block
+    [cc-else-block]
+    cc-endif
+
+cc-if = LINE-START  "#" "if" cc-expression "then" cc-eol
+
+cc-elseif-block = cc-elseif cc-block
+cc-elseif = LINE-START "#" "elseif" cc-expression "then" cc-eol
+
+cc-else-block = cc-else cc-block
+cc-else = LINE-START "#" "else" cc-eol
+
+cc-endif = LINE-START "#" ("endif" / ("end" "if")) cc-eol
+```
+静的セマンティクス
+
