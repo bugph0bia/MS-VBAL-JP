@@ -382,7 +382,7 @@ Microsoft Windows コードページ内の文字に対応する Unicode 文字�
 
 `<CP932-subsequent-character>` は コードポイント %x824f-8258 を除いて `<CP932-initial-character>` と同様に定義される。
 
-##### 3.5.1.2 韓国語識別子
+##### 3.3.5.1.2 韓国語識別子
 
 韓国語を含む識別子に対する VBA のサポートは、Windows コードページ 949 [[UNICODE-BESTFIT]](https://go.microsoft.com/fwlink/?LinkId=95708) に基づいている。韓国語文字は、%x8141 で始まるコードポイントを持つ 16 ビットのダブルバイト文字としてエンコードされている。Windows コードページ 949 のコードポイントに相当する [Unicode](./1_はじめに.md) は [UNICODE-BESTFIT] で提供されているファイル bestfit949.txt で指定されている。%x81-FE の範囲のコードポイントはすべて、コードポイントの 16 ビットエンコーディングの先頭バイトとして機能する。
 
@@ -390,7 +390,7 @@ Microsoft Windows コードページ内の文字に対応する Unicode 文字�
 
 `<CP949-subsequent-character>` は、コードポイント %xA3DF と %xA3B0-A3B9 を加えて `<CP949-initial-character>` と同様に定義される。
 
-##### 3.5.1.3 簡体字中国語識別子
+##### 3.3.5.1.3 簡体字中国語識別子
 
 簡体字中国語を含む識別子に対する VBA のサポートは、Windows コードページ 936 [[UNICODE-BESTFIT]](https://go.microsoft.com/fwlink/?LinkId=95708) に基づいている。簡体字中国語文字は、%x8140 で始まるコードポイントを持つ 16 ビットのダブルバイト文字としてエンコードされている。Windows コードページ 936 のコードポイントに相当する [Unicode](./1_はじめに.md) は、[UNICODE-BESTFIT] で提供されているファイル bestfit936.txt で指定されている。
 
@@ -398,7 +398,7 @@ Microsoft Windows コードページ内の文字に対応する Unicode 文字�
 
 `<CP936-subsequent-character>` は、コードポイント %xA3DF と %xA3B0-A3B9 を加えて `<CP949-initial-character>` と同様に定義される。
 
-##### 3.5.1.4 繁体字中国語識別子
+##### 3.3.5.1.4 繁体字中国語識別子
 
 繁体字中国語を含む識別子に対する VBA のサポートは、Windows コードページ 950 [[UNICODE-BESTFIT]](https://go.microsoft.com/fwlink/?LinkId=95708) に基づいている。繁体字中国語文字は、%xA140 で始まるコードポイントを持つ 16 ビットダブルバイト文字としてエンコードされている。Windows コードページ 950 のコードポイントに相当する [Unicode](./1_はじめに.md) は、[UNICODE-BESTFIT] で提供されているファイル bestfit950.txt で指定されている。
 
