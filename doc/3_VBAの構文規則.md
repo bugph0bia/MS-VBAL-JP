@@ -557,3 +557,14 @@ cc-endif = LINE-START "#" ("endif" / ("end" "if")) cc-eol
 ```
 静的セマンティクス
 
+- `<cc-if-block>` の構成要素である `<cc-expression>` は、`<cc-if-block>` が包含ブロック（セクション 3.4）に含まれていない場合でも、すべて次の規則に<ins>従わなければならない</ins>。
+- `<cc-if>` 内の `<cc-expression>` と各 `<cc-elseif>` 内のものはそれぞれ評価される。
+- 構成要素である `<cc-expression>` のデータ値（セクション 2.1）は、すべて `Boolean` データ型（セクション 2.1）に `Let` 強制可能で<ins>なければならない</ins>。
+- 構成要素である `<cc-expression>` のいずれかが評価エラーとなった場合、前処理されたモジュール本体（セクション 3.4）の内容は未定義となる。
+- `<cc-if-block>` が包含ブロックに含まれる場合、次の規則の順次適用に従い `<cc-block>` が最大 1 つ包含ブロックとして選択される。
+    1. `<cc-if>` 内の `<cc-expression> `の評価値が真の場合、`<cc-if>` の直後に続く `<cc-block>` が包含ブロックとなる。
+    2. `<cc-elseif>` 内にある `<cc-expression>` 要素の 1 つ以上の評価値が真である場合、その最初の`<cc-elseif>` の直後にある `<cc-block>` が包含ブロックである。
+    3. 評価された` <cc-expression>` 要素のいずれも真の値を持たず、`<cc-else-block>` が存在する場合、`<cc-else-block>` の要素である `<cc-block>` は包含ブロックである。
+    4. 評価された` <cc-expression>` のいずれも真の値を持たず、`<cc-else-block>` が存在しない場合、包含ブロックは存在しない。
+- `<cc-if-block>`, `<cc-elseif-block>`, `<cc-else-block>` の直接の要素であり、包含ブロックでない `<cc-block>` は除外ブロック（セクション 3.4）となる。
+- すべての `<cc-if>`, `<cc-elseif>`, `<cc-else>`, `<cc-endif>` 行は、前処理されたモジュール本体から除外される。
